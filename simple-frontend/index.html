@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image to Audio</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Image to Audio Converter</h1>
+        <form id="imageForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="imageFile">Choose an image:</label>
+                <input type="file" class="form-control-file" id="imageFile" name="image" accept=".jpg, .jpeg, .png">
+            </div>
+            <div class="form-group">
+                <label for="languageSelect">Select Language:</label>
+                <select class="form-control" id="languageSelect" name="language">
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Convert</button>
+        </form>
+        <audio controls id="audioPlayer" class="mt-4" style="display: none;"></audio>
+    </div>
+    
+    <!-- Include jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $("#imageForm").submit(function(event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:3004/image-to-audio/", // Replace with your API endpoint
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Display audio player and set audio source
+                        $("#audioPlayer").show();
+                        $("#audioPlayer").attr("src", URL.createObjectURL(response));
+                    },
+                    error: function(error) {
+                        console.log("Error: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
