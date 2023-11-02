@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-to-text-deployment
+  labels:
+    app: image-to-text
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: image-to-text
+  template:
+    metadata:
+      labels:
+        app: image-to-text
+    spec:
+      containers:
+      - name: image-to-text
+        image: image-to-text:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3001
