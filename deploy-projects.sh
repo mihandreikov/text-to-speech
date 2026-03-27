@@ -66,12 +66,12 @@ eval $(minikube docker-env)
 # minikube docker-env | Invoke-Expression
 
 # Deploy the "translate-api" project with local port 3002
-#deploy_project "translate-api" 3002
+deploy_project "translate-api" 3002
 
 # Deploy the "text-to-speech" project with local port 3001
-#deploy_project "image-to-text" 3001
+deploy_project "image-to-text" 3001
 
-#deploy_project "facade-api" 3004
+deploy_project "facade-api" 3004
 
 # Deploy the "frontend" project with local port 3000
 deploy_project "simple-frontend" 8080

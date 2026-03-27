@@ -11,7 +11,7 @@ COPY ./requirements.txt /code/requirements.txt
 RUN python -m pip install --upgrade pip
 RUN pip install --no-cache-dir -r /code/requirements.txt
 
-# Expose port 3001 for your FastAPI application
+# Expose port 3004 for your FastAPI application
 EXPOSE 3004
 
 # Copy your application code into the container

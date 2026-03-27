@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import logging
 from fastapi.middleware.cors import CORSMiddleware
@@ -40,13 +41,14 @@ async def predict_simple():
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
+    temp_path = f"/tmp/{file.filename}"
     try:
         logging.info(f'File received: {file.filename}')
         contents = file.file.read()
-        with open(file.filename, 'wb') as f:
+        with open(temp_path, 'wb') as f:
             f.write(contents)
 
-        im = Image.open(file.filename)
+        im = Image.open(temp_path)
         logging.info(im.size)
         label = predict_number(im)
         logging.info(f'Number received: {str(label[0])}')
@@ -58,6 +60,8 @@ async def predict(file: UploadFile = File(...)):
         return JSONResponse(content={"message": "There was an error uploading or processing the file"}, status_code=500)
     finally:
         file.file.close()
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
 
 def predict_number(image):

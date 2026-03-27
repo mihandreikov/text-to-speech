@@ -56,7 +56,7 @@ async def generate_audio(image: UploadFile = File(...),
     async with httpx.AsyncClient() as client:
         image_data = await image.read()
         response = await client.post(f"{image_to_text_microservice_url}/predict",
-                                     files={"image": (image.filename, image_data, image.content_type)})
+                                     files={"file": (image.filename, image_data, image.content_type)})
         response_json = response.json()
         number = response_json.get("number")
 
