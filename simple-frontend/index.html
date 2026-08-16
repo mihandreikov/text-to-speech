@@ -37,10 +37,13 @@
                 const formData = new FormData(this);
                 $.ajax({
                     type: "POST",
-                    url: "http://localhost:3004/image-to-audio/", // Replace with your API endpoint
+                    url: "http://localhost:3004/image-to-audio/",
                     data: formData,
                     processData: false,
                     contentType: false,
+                    xhrFields: {
+                        responseType: "blob"
+                    },
                     success: function(response) {
                         // Display audio player and set audio source
                         $("#audioPlayer").show();

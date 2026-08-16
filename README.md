@@ -1,49 +1,109 @@
-# Image of digit to speech web app
+# Image-to-Speech Web App
 
-Disclaimer: it's study project just FYI
+Study project: upload an image with a handwritten digit (`0-9`) and get spoken audio of the detected number.
 
+## Architecture
 
-## What that do
-Convert image to speech
+The system has 4 microservices:
 
-## How it work
-We have 4 microservices and every do separated job. Model trained by project 'tensor'.
+1. **simple-frontend**  
+   Static HTML UI served by Nginx (`http://localhost:8080`).
+2. **facade-api**  
+   Main API used by the frontend. Receives image + language and orchestrates downstream services.
+3. **image-to-text**  
+   TensorFlow-based digit classifier. Returns a detected number from the uploaded image.
+4. **translate-api**  
+   Converts the detected number to speech (MP3) using Google Text-to-Speech.
 
-### simple-frontend
-Simple static html with nginx as base image.
+There is also a **tensor** folder used for model training artifacts.
 
-### facade-api
-Facade microservice what proxy request to needed microservices and return data to frontend.
+## Request Flow (How it Works)
 
-### image-to-text
-Convert image of digit to text (1, 2, 3, ...). Microservice use model what trained in project 'tensor'.
+1. User uploads an image in the frontend.
+2. Frontend sends the file to `facade-api` (`POST /image-to-audio/`).
+3. `facade-api` sends the image to `image-to-text` (`POST /predict`) and receives a predicted digit.
+4. `facade-api` calls `translate-api` (`GET /generate_audio`) with the predicted digit + selected language.
+5. `facade-api` returns MP3 audio to the frontend.
+6. Frontend plays the generated audio.
 
-### translate-api
-Get digit and convert it to speech by Google text to speech technology
+## Local Setup (Docker Compose) — Recommended
 
-### tensor
-Project where train model for detecting digits from image.
+### Prerequisites
 
+- Docker Desktop installed and running
+- Docker Compose available (`docker compose version`)
 
-## Installation
+### Start
 
-#### 
-Install Minikube and Docker.
+Run from repository root:
 
-#### Set Minikube to Use the Docker Daemon on Your Local Machine
+```bash
+docker compose up --build
+```
+
+### Service Endpoints
+
+```text
+Frontend:      http://localhost:8080
+Facade API:    http://localhost:3004
+Image-to-text: http://localhost:3001
+Translate API: http://localhost:3002
+```
+
+### Stop
+
+```bash
+docker compose down
+```
+
+### Rebuild from scratch (optional)
+
+If you changed dependencies or Dockerfiles:
+
+```bash
+docker compose down
+docker compose build --no-cache
+docker compose up
+```
+
+## Usage
+
+1. Open `http://localhost:8080`
+2. Select an image file (`.jpg`, `.jpeg`, `.png`) with a clear handwritten digit
+3. Select language (`en`, `es`, `fr`)
+4. Click **Convert**
+5. Play the returned audio in the player
+
+## Troubleshooting
+
+- **Command typo issue**  
+  Use a single command:
+  ```bash
+  docker compose up --build
+  ```
+  (not `docker compose up --builddocker compose up --build`)
+
+- **Port already in use**  
+  Stop the process using that port, or change port mapping in `docker-compose.yml`.
+
+- **Containers started but app not responding**  
+  Check logs:
+  ```bash
+  docker compose logs -f
+  ```
+
+- **Need clean restart**  
+  ```bash
+  docker compose down -v
+  docker compose up --build
+  ```
+
+## Kubernetes/Minikube (Alternative)
+
+This repository also includes Kubernetes manifests and a deployment script:
+
 ```bash
 minikube config set driver docker
-```
-#### Run Minikube. For best perfomance you can use all cpus of computer
-```bash
 minikube start --cpus max
+./deploy-projects.sh
 ```
-#### Use script to deploy all microservices to Minikube
-```bash
-# Make the deploy file executable
-deploy-projects.sh
-```
-
-## Using the App
-
-**Frontend:** http://localhost:8080/

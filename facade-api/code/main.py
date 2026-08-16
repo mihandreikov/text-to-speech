@@ -32,10 +32,10 @@ async def root():
   return {"pong"}
 
 
-image_to_text_microservice_url = "http://image-to-text-service"  # Replace with the actual URL
+image_to_text_microservice_url = "http://image-to-text-service:3001"
 
 # URL of the text-to-audio microservice
-translate_api_microservice_url = "http://translate-api-service"  # Replace with the actual URL
+translate_api_microservice_url = "http://translate-api-service:3002"
 
 
 class SupportedLanguages(str, Enum):
@@ -56,15 +56,18 @@ async def generate_audio(image: UploadFile = File(...),
     async with httpx.AsyncClient() as client:
         image_data = await image.read()
         response = await client.post(f"{image_to_text_microservice_url}/predict",
-                                     files={"image": (image.filename, image_data, image.content_type)})
+                                     files={"file": (image.filename, image_data, image.content_type)})
+        response.raise_for_status()
         response_json = response.json()
         number = response_json.get("number")
 
     async with httpx.AsyncClient() as client:
-        audio_response = await client.get(f"{translate_api_microservice_url}/generate_audio/?number={number}&language={language}")
+        audio_response = await client.get(
+            f"{translate_api_microservice_url}/generate_audio/?number={number}&language={language.value}"
+        )
+        audio_response.raise_for_status()
 
         # Read the audio data
         audio_data = audio_response.content
 
     return StreamingResponse(io.BytesIO(audio_data), media_type="audio/mpeg")
-

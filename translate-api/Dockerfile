@@ -1,15 +1,14 @@
-FROM alpine:latest 
+FROM python:3.11-slim
 
-RUN apk add --no-cache python3
+WORKDIR /code
 
-RUN python -m ensurepip --upgrade
+COPY ./requirements.txt /code/requirements.txt
 
-WORKDIR /app
+RUN python -m pip install --upgrade pip
+RUN pip install --no-cache-dir -r /code/requirements.txt
 
-COPY . .
-
-RUN pip3 --no-cache install fastapi num2words gtts uvicorn
+COPY . /code
 
 EXPOSE 3002
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3002"]
+CMD ["uvicorn", "code.main:app", "--host", "0.0.0.0", "--port", "3002"]
