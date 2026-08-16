@@ -1,0 +1,55 @@
+services:
+  image-to-text:
+    build:
+      context: ./image-to-text
+      dockerfile: Dockerfile
+    container_name: image-to-text-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - tts-network
+
+  translate-api:
+    build:
+      context: ./translate-api
+      dockerfile: Dockerfile
+    container_name: translate-api-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - tts-network
+
+  facade-api:
+    build:
+      context: ./facade-api
+      dockerfile: Dockerfile
+    container_name: facade-api-service
+    ports:
+      - "3004:3004"
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - image-to-text
+      - translate-api
+    networks:
+      - tts-network
+
+  frontend:
+    build:
+      context: ./simple-frontend
+      dockerfile: Dockerfile
+    container_name: frontend-service
+    ports:
+      - "8080:80"
+    depends_on:
+      - facade-api
+    networks:
+      - tts-network
+
+networks:
+  tts-network:
+    driver: bridge

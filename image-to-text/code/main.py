@@ -27,7 +27,7 @@ app.add_middleware(
 )
 
 
-model = models.load_model("trained-models/trained_model_v2.h5")
+model = models.load_model("trained-models/trained_model_v2.h5", compile=False)
 
 
 @app.get("/predict_simple")
